@@ -136,7 +136,6 @@ cartController.getCartItems();
                         // Items Section
                         Expanded(
                           child: Obx(() {
-                            var selectedCategory = controller.categories[controller.selectedCategory.value];
                             var items = controller.items;
                             return controller.isLoadingBarang.value ? Center(child: CircularProgressIndicator()) :  ListView.builder(
                               itemCount: items.length,
@@ -144,7 +143,7 @@ cartController.getCartItems();
                                 final item = items[index];
                                 return  MenuItem(
                                   id: items[index]['id'],
-                                  imageUrl: host+items[index]['image'],
+                                  imageUrl: baseURL+items[index]['image'],
                                   name: items[index]['nama'],
                                   price: formatRupiah(items[index]['harga']),
                                   onAddToCart: (){

@@ -25,7 +25,7 @@ class MenuItemDetailPage extends StatelessWidget {
         children: [
           // Gambar besar di atas
           Image.network(
-            host+ menuItem['image'],
+            baseURL+ menuItem['image'],
             width: double.infinity,
             height: 250,
             fit: BoxFit.cover,
@@ -84,7 +84,7 @@ class MenuItemDetailPage extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () async {
                    await cartController.addToCart(menuItem['id'], qty.value, menuItem['harga']);
-                   Get.offAndToNamed("/pesan");
+                   Get.offAndToNamed("/home");
                   },
                   style: ElevatedButton.styleFrom(
                     padding: EdgeInsets.symmetric(vertical: 15.0),

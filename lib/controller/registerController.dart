@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
+import 'package:mbakendang/apiRequest/apiServices.dart';
 
 class RegisterController extends GetxController {
   var username = ''.obs;
@@ -22,7 +23,7 @@ class RegisterController extends GetxController {
 
     try {
       final response = await _dio.post(
-        'http://192.168.18.9:8000/api/register',
+        baseURL+'/api/register',
         data: {
           'username': username.value,
           'nama': fullName.value,

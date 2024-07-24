@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mbakendang/Components/cartItem.dart';
 import 'package:mbakendang/Components/helper.dart';
+import 'package:mbakendang/apiRequest/apiServices.dart';
 import 'controller/cartController.dart';
 
 class CartView extends StatelessWidget {
@@ -28,7 +29,7 @@ class CartView extends StatelessWidget {
                 itemBuilder: (context, index) {
                   var item = controller.cartItems[index];
                    return CartItem(
-                    imageUrl: "http://192.168.18.9:8000" + item['barangs']['image'],
+                    imageUrl: baseURL + item['barangs']['image'],
                     name: item['barangs']['nama'],
                     qty: item['qty'],
                     total: formatRupiah(item['barangs']['harga'] * item['qty']), onRemove: () {
@@ -55,7 +56,44 @@ class CartView extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: () {
                         // Logic for placing the order goes here
-                        controller.checkout();
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Pilih Tanggal dan Waktu'),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Obx(() => ListTile(
+                                    title: Text('Tanggal: ${controller.selectedDate.value.toLocal()}'.split(' ')[0]),
+                                    trailing: Icon(Icons.calendar_today),
+                                    onTap: () => controller.selectDate(context),
+                                  )),
+                                  Obx(() => ListTile(
+                                    title: Text('Waktu: ${controller.selectedTime.value.format(context)}'),
+                                    trailing: Icon(Icons.access_time),
+                                    onTap: () => controller.selectTime(context),
+                                  )),
+                                ],
+                              ),
+                              actions: [
+                                TextButton(
+                                  child: Text('Batal'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                                TextButton(
+                                  child: Text('OK'),
+                                  onPressed: () {
+                                    controller.checkout();
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.symmetric(vertical: 15.0),

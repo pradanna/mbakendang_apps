@@ -1,6 +1,9 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:mbakendang/Components/helper.dart';
+import 'package:mbakendang/apiRequest/apiServices.dart';
 
 class CartController extends GetxController {
   var isAddingToCart = false.obs;
@@ -11,6 +14,8 @@ class CartController extends GetxController {
   var totalPrice = 0.obs;
   var cartItems = <dynamic>[].obs;
 var cartItemsCount = 0.obs;
+  var selectedDate = DateTime.now().obs;
+  var selectedTime = TimeOfDay.now().obs;
 
   Future<void> addToCart(int idbarang, int qty, int harga) async {
     final token = await storage.read('token');
@@ -22,7 +27,7 @@ var cartItemsCount = 0.obs;
     isAddingToCart(true);
     try {
       final response = await _dio.post(
-        'http://192.168.18.9:8000/api/cart',
+        baseURL+'/api/cart',
         data: {
           'barang_id': idbarang,
           'qty': qty,
@@ -59,7 +64,7 @@ var cartItemsCount = 0.obs;
     isLoadingCart(true);
     try {
       final response = await _dio.get(
-        'http://192.168.18.9:8000/api/cart',
+        baseURL+'/api/cart',
         options: Options(
           headers: {
             'Authorization': 'Bearer $token',
@@ -103,7 +108,7 @@ var cartItemsCount = 0.obs;
 
     try {
       final response = await _dio.delete(
-        'http://192.168.18.9:8000/api/cart/$id',
+        baseURL+'/api/cart/$id/delete',
         options: Options(
           headers: {
             'Authorization': 'Bearer $token',
@@ -131,26 +136,19 @@ var cartItemsCount = 0.obs;
       return;
     }
 
-    DateTime now = DateTime.now();
-
-    // Mendapatkan bagian tanggal saja (tahun, bulan, hari)
-    String date = '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
-
-    // Mendapatkan bagian waktu saja (jam, menit, detik)
-    String time = '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}';
-
-
     isAddingToCart(true);
     try {
       final response = await _dio.post(
-        'http://192.168.18.9:8000/api/cart/checkout',
+        baseURL+'/api/cart/checkout',
       data: {
-          'tanggal': date ,
-              'jam' : time
+          'tanggal': formatDate(selectedDate.value),
+              'jam' : '${selectedTime.value.hour.toString().padLeft(2, '0')}:${selectedTime.value.minute.toString().padLeft(2, '0')}:00'
+
       },
         options: Options(
           headers: {
             'Authorization': 'Bearer $token',
+
           },
         ),
       );
@@ -165,7 +163,34 @@ var cartItemsCount = 0.obs;
       Get.snackbar('Error', 'An error occurred while adding item to cart');
     } finally {
       isAddingToCart(false);
-      Get.toNamed("/payment");
+      Get.toNamed("/home");
+    }
+  }
+
+  Future<void> selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate.value,
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != selectedDate.value) {
+      selectedDate.value = picked;
+      print(picked.toString());
+      print(formatDate(selectedDate.value));
+    }
+  }
+
+  Future<void> selectTime(BuildContext context) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: selectedTime.value,
+    );
+    if (picked != null && picked != selectedTime.value) {
+      selectedTime.value = picked;
+      print(picked.toString());
+      print('${selectedTime.value.hour.toString().padLeft(2, '0')}:${selectedTime.value.minute.toString().padLeft(2, '0')}:00');
+
     }
   }
 }

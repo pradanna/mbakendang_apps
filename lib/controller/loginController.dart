@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:mbakendang/apiRequest/apiServices.dart';
 
 class LoginController extends GetxController {
   var username = ''.obs;
@@ -14,7 +15,7 @@ class LoginController extends GetxController {
     isLoading(true);
     try {
       final response = await _dio.post(
-        'http://192.168.18.9:8000/api/login',
+        baseURL+'/api/login',
         data: {
           'username': username.value,
           'password': password.value,

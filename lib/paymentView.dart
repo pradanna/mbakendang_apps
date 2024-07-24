@@ -3,12 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mbakendang/Components/helper.dart';
 import 'controller/paymentController.dart';
 
 class PaymentView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Paymentcontroller controller = Get.put(Paymentcontroller());
+    final id = Get.arguments['id'];
+
+    controller.getPaymentData(id);
 
     return Scaffold(
       appBar: AppBar(
@@ -20,23 +24,25 @@ class PaymentView extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Expanded(
-              child: Obx(() => ListView.builder(
+              child: Obx(() => controller.isloading.value ? Center(child: CircularProgressIndicator(),) : ListView.builder(
                 itemCount: controller.items.length,
                 itemBuilder: (context, index) {
                   final item = controller.items[index];
+                  print("item count " +controller.items.length.toString());
+
                   return ListTile(
-                    title: Text(item['name']),
+                    title: Text(item['barangs_all']['nama'].toString()),
                     subtitle: Text(
-                        'Rp${item['price']} x ${item['quantity']}'),
+                        formatRupiah(item['harga']) +"x"+ item['qty'].toString()),
                     trailing: Text(
-                        'Rp${item['price'] * item['quantity']}'),
+                        formatRupiah(item['harga'] * item['qty'])),
                   );
                 },
               )),
             ),
             Divider(),
-            Obx(() => Text(
-              'Total: Rp${controller.amount.value}',
+            Obx(() => controller.isloading.value ? Center(child: CircularProgressIndicator(),) :Text(
+              'Total: '+formatRupiah(int.parse(controller.total.value)).toString(),
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -76,19 +82,21 @@ class PaymentView extends StatelessWidget {
             SizedBox(height: 20),
             Container(
               width: 1.sw,
-              child: ElevatedButton(
-                onPressed: () => controller.makePayment(),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue, // Background color
-                  foregroundColor: Colors.white, // Text color
-                  padding: EdgeInsets.symmetric(vertical: 15.0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
+              child: Obx(() =>
+                controller.loadingSendProff.value ? Center(child: CircularProgressIndicator(),) :  ElevatedButton(
+                  onPressed: () => controller.sendPaymentProof(id.toString()),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue, // Background color
+                    foregroundColor: Colors.white, // Text color
+                    padding: EdgeInsets.symmetric(vertical: 15.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
                   ),
-                ),
-                child: Text(
-                  'Kirim Pembayaran',
-                  style: TextStyle(fontSize: 16),
+                  child: Text(
+                    'Kirim Pembayaran',
+                    style: TextStyle(fontSize: 16),
+                  ),
                 ),
               ),
             ),

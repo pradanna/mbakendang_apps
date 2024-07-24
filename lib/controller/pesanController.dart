@@ -1,10 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:mbakendang/apiRequest/apiServices.dart';
 
 class PesanController extends GetxController {
-  var userName = 'John Doe'.obs;
-  var phoneNumber = '123456789'.obs;
+  var userName = ''.obs;
+  var phoneNumber = ''.obs;
   var isLoading = false.obs, isLoadingBarang = false.obs;
   var selectedCategory = 0.obs;
   final Dio _dio = Dio();
@@ -30,7 +31,7 @@ class PesanController extends GetxController {
     isLoading(true);
     try {
       final response = await _dio.get(
-        'http://192.168.18.9:8000/api/profile',
+        baseURL+'/api/profile',
         options: Options(
           headers: {
             'Authorization': 'Bearer $token',
@@ -61,7 +62,7 @@ class PesanController extends GetxController {
     isLoadingBarang(true);
     try {
       final response = await _dio.get(
-        'http://192.168.18.9:8000/api/barangs?q='+param,
+        baseURL+'/api/barangs?q='+param,
         options: Options(
           headers: {
             'Authorization': 'Bearer $token',
@@ -69,7 +70,6 @@ class PesanController extends GetxController {
         ),
       );
 
-      print(response.data);
 
       if (response.statusCode == 200) {
         // Store profile data
